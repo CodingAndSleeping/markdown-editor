@@ -1,0 +1,28 @@
+{
+  "name": "markdown-editor",
+  "private": true,
+  "version": "0.0.0",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "electron": "wait-on tcp:5173 && tsc && cross-env NODE_ENV=development electron .",
+    "electron:dev": "concurrently -k \"npm run dev \" \"npm run electron\"",
+    "electron:build":"npm run build && tsc && electron-builder"
+  },
+  "dependencies": {
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "concurrently": "^8.2.1",
+    "cross-env": "^7.0.3",
+    "electron": "^26.2.1",
+    "electron-builder": "^24.6.4",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
+    "vue-tsc": "^1.8.5",
+    "wait-on": "^7.0.1"
+  }
+}
