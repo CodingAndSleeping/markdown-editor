@@ -1,28 +1,19 @@
 // 控制应用生命周期和创建原生浏览器窗口的模组
-import { app, BrowserWindow } from "electron"
-import path from "node:path"
+import { app, BrowserWindow, ipcMain } from "electron";
+import saveFile from "./file/saveFile";
+import createWindow from "./app/createWindow";
+import setMenu from './app/setMenu';
+process.env["ELECTRON_DISABLE_SECURITY_WARNINGS"] = "true"; // 取警告
 
-function createWindow() {
-  // 创建浏览器窗口
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      // 引入预加载文件
-      preload: path.join(__dirname, "preload.js"),
-    },
-  });
-    
-  // 加载vite启动的本地服务
-  mainWindow.loadURL("http://localhost:5173");
-
-}
-
-// 这段程序将会在 Electron 结束初始化
-// 和创建浏览器窗口的时候调用
-// 部分 API 在 ready 事件触发后才能使用。
 app.whenReady().then(() => {
-  createWindow();
+  createWindow()
+  setMenu()
+  ipcMain.handle(
+    "save-file",
+    () => {
+      return saveFile();
+    }
+  );
 
   app.on("activate", function () {
     // 通常在 macOS 上，当点击 dock 中的应用程序图标时，如果没有其他

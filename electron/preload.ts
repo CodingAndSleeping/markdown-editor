@@ -1,2 +1,5 @@
-// 这里我们随便写一句话
-console.log("preload");
+const { contextBridge, ipcRenderer } = require('electron')
+
+contextBridge.exposeInMainWorld('electron', {
+  saveFile: () => ipcRenderer.invoke('save-file')
+})
