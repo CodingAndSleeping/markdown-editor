@@ -1,5 +1,7 @@
+import { IpcRendererEvent } from "electron"
+
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electron', {
-  saveFile: () => ipcRenderer.invoke('save-file')
+    readFile: (callback: (event:IpcRendererEvent, value:string)=>void) => ipcRenderer.on('read-file', callback)
 })

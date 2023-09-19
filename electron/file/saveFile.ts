@@ -1,17 +1,27 @@
-import {dialog} from 'electron';
-import fs from 'fs';
+import { BrowserWindow, dialog } from "electron";
+import fs from "fs";
 
-const decoder = new TextDecoder()
-export default function(){
+export default function (win: BrowserWindow) {
   const file = dialog.showOpenDialogSync({
-    properties: ['openFile']
-  })
+    properties: ["openFile"],
+  });
+  let res: string = "";
+  if (file) {
+    const rs = fs.createReadStream(file[0], {
+      encoding: "utf8",
+    });
 
-  if(file){
-    const a =  fs.readFileSync(file[0])
-    console.log(a)
+    rs.on("data", (chunk) => {
+      res += chunk;
+    });
 
-    console.log( decoder.decode(a))
+    rs.on("error", (err) => {
+      console.log(err);
+    });
+
+    rs.on("end", () => {
+      console.log("res=>", res);
+      win.webContents.send("read-file", res);
+    });
   }
-  
 }

@@ -1,17 +1,12 @@
 <template>
-<md-editor v-model="text"></md-editor>
-<!-- <md-preview v-model="text"></md-preview> -->
+<Index></Index>
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue';
-
-const text = ref<string>('# aaa')
-
-
+    import Index from './views/index.vue';
 </script>
 
 
 
-<style scoped>
+<style scoped lang="scss">
 </style>

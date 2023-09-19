@@ -1,20 +1,12 @@
 // 控制应用生命周期和创建原生浏览器窗口的模组
-import { app, BrowserWindow, ipcMain } from "electron";
-import saveFile from "./file/saveFile";
+import { app, BrowserWindow } from "electron";
 import createWindow from "./app/createWindow";
 import setMenu from './app/setMenu';
-process.env["ELECTRON_DISABLE_SECURITY_WARNINGS"] = "true"; // 取警告
+process.env["ELECTRON_DISABLE_SECURITY_WARNINGS"] = "true"; // 去掉警告
 
 app.whenReady().then(() => {
-  createWindow()
-  setMenu()
-  ipcMain.handle(
-    "save-file",
-    () => {
-      return saveFile();
-    }
-  );
-
+  const win =  createWindow()
+  setMenu(win)
   app.on("activate", function () {
     // 通常在 macOS 上，当点击 dock 中的应用程序图标时，如果没有其他
     // 打开的窗口，那么程序会重新创建一个窗口。
