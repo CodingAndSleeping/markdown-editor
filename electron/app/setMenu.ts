@@ -1,6 +1,5 @@
 import { BrowserWindow, Menu } from "electron";
-import saveFile from "../file/saveFile";
-
+import {openFile, saveFile} from "../file/index";
 export default function (win: BrowserWindow) {
   const template = [
     {
@@ -9,13 +8,11 @@ export default function (win: BrowserWindow) {
         //子菜单
         {
           label: "打开",
-          click: () => saveFile(win),
+          click: () => openFile(win),
         },
         {
           label: "保存",
-          click: () => {
-            console.log("save");
-          },
+          click: () => saveFile(win),
         },
       ],
     },

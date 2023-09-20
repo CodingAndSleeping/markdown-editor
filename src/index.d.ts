@@ -1,14 +1,18 @@
-
-import { IpcRendererEvent } from "electron";  
-
+import { IpcRendererEvent } from "electron";
 
 declare global {
-  interface IElectron {
-    readFile: (
+  export interface IElectron {
+    openFile: (
       callback: (event: IpcRendererEvent, value: string) => void
     ) => Electron.IpcRenderer;
+
+    openSaveDialog: (
+      callback: (event: IpcRendererEvent) => void
+    ) => Electron.IpcRenderer;
+
+    saveFile: (text: string) => void;
   }
-  interface Window {
+  export interface Window {
     electron: IElectron;
   }
 }
