@@ -1,6 +1,9 @@
 import { BrowserWindow, dialog, ipcMain } from "electron";
 import fs from "fs";
 
+// 新建
+// export function new
+
 // 读取文件
 export function openFile(win: BrowserWindow) {
   const file = dialog.showOpenDialogSync({
@@ -32,7 +35,6 @@ export function saveFile(win: BrowserWindow) {
   const file = dialog.showSaveDialogSync({});
 
   if (file) {
-
     const ws = fs.createWriteStream(file, {
         encoding: "utf8",
         flags: 'w'
@@ -40,7 +42,7 @@ export function saveFile(win: BrowserWindow) {
     ipcMain.on('save-file', (event:Electron.IpcMainInvokeEvent, text:string)=>{
         ws.write(text)
     })
-    ws.on('end', ()=>{
+    ws.on('finish', ()=>{
         console.log("保存成功！")
         ws.close()
     })
@@ -48,13 +50,6 @@ export function saveFile(win: BrowserWindow) {
     ws.on('error', (err:Error)=>{
         console.log(err)
     })
-
-
-  
     win.webContents.send('open-save-dialog')
-    
-
-
-    
   }
 }
