@@ -5,8 +5,8 @@ import path from 'path';
 export default function(){
     // 创建浏览器窗口
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 900,
     webPreferences: {
       // 引入预加载文件
       preload: path.join(__dirname, "../preload.js"),

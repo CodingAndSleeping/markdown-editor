@@ -1,5 +1,15 @@
 import { IpcRendererEvent } from "electron";
-export interface IElectron {
+
+export interface IDirTree {
+  path: string;
+  name: string;
+  type: "dir" | "file";
+  deep: number;
+  key: string;
+  children?: IDirTree[];
+}
+
+export interface IFileApi {
   openFile: (
     callback: (event: IpcRendererEvent, value: string) => void
   ) => Electron.IpcRenderer;
@@ -9,9 +19,20 @@ export interface IElectron {
   ) => Electron.IpcRenderer;
 
   saveFile: (text: string) => void;
+
+  openDir: (
+    callback: (event: IpcRendererEvent, tree:IDirTree[]) => void
+  ) => Electron.IpcRenderer;
+
+  selectFile: (path:string)=> Promise<string>
+}
+
+export interface IViewApi {
+  isShowSidebar: (callback: () => void) => Electron.IpcRenderer;
 }
 declare global {
   export interface Window {
-    electronAPI: IElectron;
+    fileApi: IFileApi;
+    viewApi: IViewApi;
   }
 }

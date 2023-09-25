@@ -10,9 +10,11 @@ declare module 'vue' {
     ASplit: typeof import('@arco-design/web-vue')['Split']
     ATabPane: typeof import('@arco-design/web-vue')['TabPane']
     ATabs: typeof import('@arco-design/web-vue')['Tabs']
+    ATree: typeof import('@arco-design/web-vue')['Tree']
     ATypographyParagraph: typeof import('@arco-design/web-vue')['TypographyParagraph']
     Editor: typeof import('./src/components/Editor.vue')['default']
     Preview: typeof import('./src/components/Preview.vue')['default']
     SideBar: typeof import('./src/components/SideBar.vue')['default']
+    SvgIcon: typeof import('./src/components/SvgIcon.vue')['default']
   }
 }

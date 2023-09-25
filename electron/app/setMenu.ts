@@ -1,5 +1,5 @@
 import { Menu, MenuItemConstructorOptions } from "electron";
-import { openFile, saveFile } from "../file/index";
+import { openFile, saveFile, openDir } from "../file/index";
 import createWindow from "./createWindow";
 export default function () {
   const template: MenuItemConstructorOptions[] = [
@@ -34,7 +34,8 @@ export default function () {
         {
           label: "打开文件夹",
           click(menuItem, win, e) {
-            openFile(win!);
+            // 打开文件夹
+            openDir(win!);
           },
         },
         {
@@ -43,12 +44,14 @@ export default function () {
         {
           label: "保存",
           accelerator: "CmdOrCtrl+S",
-          click: (menuItem, win, e) => saveFile(win!),
-        }
+          click(menuItem, win, e) {
+            saveFile(win!);
+          },
+        },
       ],
     },
     {
-      label: "编辑", 
+      label: "编辑",
       submenu: [
         //子菜单
         {
@@ -63,18 +66,17 @@ export default function () {
       ],
     },
     {
-      label:"视图", 
-      submenu:[
+      label: "视图",
+      submenu: [
         {
-          label:"显示/隐藏侧边栏",
-          accelerator:"CmdOrCtrl+Shift+L",
-          click(menuItem,win,e){
-            
-          }
-        }
-      ]
-      
-    }
+          label: "显示/隐藏侧边栏",
+          accelerator: "CmdOrCtrl+Shift+L",
+          click(menuItem, win, e) {
+            if (win) win.webContents.send("is-show-sidebar");
+          },
+        },
+      ],
+    },
   ];
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }

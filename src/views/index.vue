@@ -4,14 +4,19 @@
       :style="{
         height: '100%',
         width: '100%',
-        minWidth: '500px',
+        '--resizeTrrigerWidth': resizeTrrigerWidth,
       }"
       v-model:size="size"
-      min="180px"
-      max="300px"
+      :min="minSize"
+      :max="maxSize"
+      @move-end="handleMoveEnd"
     >
       <template #first>
-        <SideBar :textObj="textObj" ></SideBar>
+        <SideBar :textObj="textObj"></SideBar>
+      </template>
+
+      <template #resize-trigger>
+        <div class="resize-triger"></div>
       </template>
       <template #second>
         <Editor :textObj="textObj" v-if="type === 'edit'"></Editor>
@@ -25,24 +30,49 @@
 import SideBar from "../components/SideBar.vue";
 import Editor from "../components/Editor.vue";
 import Preview from "../components/Preview.vue";
-import {ItextObj} from '../types/text';
+import { ItextObj } from "../types/text";
 import { ref } from "vue";
 import { IpcRendererEvent } from "electron";
+const { fileApi, viewApi } = window;
 const textObj = ref<ItextObj>({
   id: "editor1",
   text: "# aaa",
 });
 const type = ref<"edit" | "preview">("edit");
-window.electronAPI.openFile((event: IpcRendererEvent, value: string) => {
+fileApi.openFile((event: IpcRendererEvent, value: string) => {
   type.value = "edit";
   textObj.value.text = value;
 });
-window.electronAPI.openSaveDialog(async (event: IpcRendererEvent) => {
+fileApi.openSaveDialog(async (event: IpcRendererEvent) => {
   // 把文本传给主进程
-  window.electronAPI.saveFile(textObj.value.text);
+  fileApi.saveFile(textObj.value.text);
 });
 
+// 是否显示侧边栏
+const showSideBar = ref<boolean>(true);
+// 侧边栏尺寸
 const size = ref<number>(0.2);
+const minSize = ref<number>(0.1);
+const maxSize = ref<number>(0.4);
+// 拖动器宽度
+const resizeTrrigerWidth = ref<string>("5px");
+// 侧边栏当前尺寸
+const curSize = ref<number>(0.2);
+function handleMoveEnd() {
+  curSize.value = size.value;
+}
+viewApi.isShowSidebar(() => {
+  showSideBar.value = !showSideBar.value;
+  if (showSideBar.value) {
+    size.value = curSize.value;
+    minSize.value = 0.1;
+    resizeTrrigerWidth.value = "5px";
+  } else {
+    size.value = 0;
+    minSize.value = 0;
+    resizeTrrigerWidth.value = "0";
+  }
+});
 </script>
 
 <style scoped lang="scss">
@@ -50,5 +80,10 @@ const size = ref<number>(0.2);
   height: 100%;
   width: 100%;
   display: flex;
+  .resize-triger {
+    height: 100%;
+    width: var(--resizeTrrigerWidth);
+    background-color: #e6e6e6;
+  }
 }
 </style>
