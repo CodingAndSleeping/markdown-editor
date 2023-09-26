@@ -27,14 +27,14 @@
 </template>
 
 <script setup lang="ts">
-import SideBar from "../components/SideBar.vue";
-import Editor from "../components/Editor.vue";
-import Preview from "../components/Preview.vue";
-import { ItextObj } from "../types/text";
+import SideBar from "@/views/components/SideBar.vue";
+import Editor from "@/views/components/Editor.vue";
+import Preview from "@/views/components/Preview.vue";
+import { IMdText } from "@/types/text";
 import { ref } from "vue";
 import { IpcRendererEvent } from "electron";
 const { fileApi, viewApi } = window;
-const textObj = ref<ItextObj>({
+const textObj = ref<IMdText>({
   id: "editor1",
   text: "# aaa",
 });

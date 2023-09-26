@@ -3,6 +3,6 @@ export default interface IDirTree {
   name: string;
   type: "dir" | "file";
   deep: number;
-  key: string;
+  // key: string;
   children?: IDirTree[];
 }

@@ -43,7 +43,7 @@ export default function createDirTree(
         name: name,
         type: "dir",
         deep: deep,
-        key: deep + "-" + index,
+        // key: deep + "-" + index,
         children: createDirTree(subDirs, deep + 1, filter, destinationExtName), // 递归调用
       };
     }
@@ -53,7 +53,7 @@ export default function createDirTree(
       name: name,
       type: "file",
       deep: deep,
-      key: deep + "-" + index,
+      // key: deep + "-" + index,
     };
   });
 

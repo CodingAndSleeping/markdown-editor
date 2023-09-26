@@ -1,22 +1,21 @@
 <template>
   <div class="main">
-    <md-editor class="editor" :editor-id="textObj.id" v-model="textObj.text"> </md-editor>
+    <md-editor class="editor" :editor-id="textObj.id" v-model="textObj.text">
+    </md-editor>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ItextObj} from '../types/text';
+import { IMdText } from "@/types/text";
 const props = defineProps<{
-  textObj:ItextObj
+  textObj: IMdText;
 }>();
-
-
 </script>
 
 <style lang="scss">
 .main {
   height: 100%;
-  .editor{
+  .editor {
     height: 100%;
   }
 }

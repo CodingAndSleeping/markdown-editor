@@ -1,4 +1,4 @@
-export interface ItextObj{
+export interface IMdText{
     id:string,
     text:string
 }

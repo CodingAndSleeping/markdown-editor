@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import { ItextObj } from "../types/text";
+import { IMdText } from "@/types/text";
 const props = defineProps<{
-  textObj: ItextObj;
+  textObj: IMdText;
 }>();
 </script>
 
