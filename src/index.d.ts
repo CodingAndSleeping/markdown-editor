@@ -5,7 +5,8 @@ export interface IDirTree {
   name: string;
   type: "dir" | "file";
   deep: number;
-  // key: string;
+  key: string;
+  edit:boolean,
   children?: IDirTree[];
 }
 
@@ -18,13 +19,16 @@ export interface IFileApi {
     callback: (event: IpcRendererEvent) => void
   ) => Electron.IpcRenderer;
 
-  saveFile: (text: string) => void;
+  // saveFile: (text: string) => void;
 
   openDir: (
     callback: (event: IpcRendererEvent, tree:IDirTree[]) => void
   ) => Electron.IpcRenderer;
 
   selectFile: (path:string)=> Promise<string>
+
+
+  createFile: (path:string)=> Promise<any>
 }
 
 export interface IViewApi {

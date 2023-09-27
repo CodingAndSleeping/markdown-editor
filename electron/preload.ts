@@ -9,8 +9,8 @@ contextBridge.exposeInMainWorld("fileApi", {
   openSaveDialog: (callback: (event: IpcRendererEvent) => void) =>
     ipcRenderer.on("open-save-dialog", callback),
 
-  // 保存文件
-  saveFile: (text: string) => ipcRenderer.send("save-file", text),
+  // // 保存文件
+  // saveFile: (text: string) => ipcRenderer.send("save-file", text),
 
   // 打开文件夹
   openDir: (callback: (event: IpcRendererEvent, tree: IDirTree[]) => void) =>
@@ -18,6 +18,9 @@ contextBridge.exposeInMainWorld("fileApi", {
 
   // 选择文件
   selectFile: (path: string) => ipcRenderer.invoke("select-file", path),
+
+  // 新建文件
+  createFile:(path:string)=>ipcRenderer.invoke("create-file", path)
 });
 
 contextBridge.exposeInMainWorld("viewApi", {

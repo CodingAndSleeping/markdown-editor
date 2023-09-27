@@ -34,26 +34,29 @@ export default function createDirTree(
   let res: IDirTree[] = [];
 
   res = dirs.map((dir, index) => {
+    const filePath = path.dirname(dir)
     const name = path.basename(dir);
     const stat = fs.statSync(dir);
     if (stat.isDirectory()) {
       const subDirs = fs.readdirSync(dir).map((item) => path.join(dir, item)); // 拼接子文件路径
       return {
-        path: dir,
+        path: filePath,
         name: name,
         type: "dir",
         deep: deep,
-        // key: deep + "-" + index,
+        key: filePath+ '/' + name,
+        edit: false,
         children: createDirTree(subDirs, deep + 1, filter, destinationExtName), // 递归调用
       };
     }
 
     return {
-      path: dir,
+      path: filePath,
       name: name,
       type: "file",
       deep: deep,
-      // key: deep + "-" + index,
+      edit: false,
+      key: filePath+ '/' + name,
     };
   });
 

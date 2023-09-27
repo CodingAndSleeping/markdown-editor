@@ -45,7 +45,8 @@ fileApi.openFile((event: IpcRendererEvent, value: string) => {
 });
 fileApi.openSaveDialog(async (event: IpcRendererEvent) => {
   // 把文本传给主进程
-  fileApi.saveFile(textObj.value.text);
+  event.sender.send("save-file", textObj.value.text)
+
 });
 
 // 是否显示侧边栏

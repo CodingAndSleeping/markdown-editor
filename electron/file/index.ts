@@ -2,6 +2,7 @@ import { BrowserWindow, dialog, ipcMain } from "electron";
 import fs from "fs";
 import createDirTree from "../utils/createDirTree";
 import IDirTree from "../types/dirTree";
+import createWindow from "../app/createWindow";
 
 const filters: Electron.FileFilter[] = [
   {
@@ -84,19 +85,33 @@ export function saveFile(win: BrowserWindow) {
 }
 
 // 打开文件夹
-export function openDir(win: BrowserWindow) {
+export async function openDir(win: BrowserWindow) {
+
   const files = dialog.showOpenDialogSync({
     properties: ["openDirectory"],
   });
-
   if (files) {
+    // 打开一个新窗口
+    const newWin =await createWindow()
     const tree: IDirTree[] = createDirTree(
       files,
       0,
       ["node_modules"],
       filters[0].extensions
     );
-    win.webContents.send("open-dir", tree);
+
+    newWin.webContents.send("open-dir", tree);
+
+    // 侦听目录变化
+    fs.watch(files[0], null, (eventType:fs.WatchEventType, filename:string | null)=>{
+      const tree: IDirTree[] = createDirTree(
+        files,
+        0,
+        ["node_modules"],
+        filters[0].extensions
+      );
+      newWin.webContents.send("open-dir", tree);
+    })
   }
 }
 
@@ -115,3 +130,16 @@ export function selectFile() {
     }
   );
 }
+
+
+// 新建文件
+export function createFile(){
+  ipcMain.handle('create-file', (e:Electron.IpcMainInvokeEvent, path:string)=>{
+    if(!fs.existsSync(path)){
+      console.log(path)
+     fs.writeFileSync(path, '')
+    }  
+  })
+}
+
+
