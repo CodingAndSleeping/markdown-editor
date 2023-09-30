@@ -1,9 +1,9 @@
 export default interface IDirTree {
-  path: string;
+  basedir: string;
   name: string;
   type: "dir" | "file";
   deep: number;
-  key: string;
+  path: string;
   edit:boolean,
   children?: IDirTree[];
 }

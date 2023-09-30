@@ -16,11 +16,16 @@ contextBridge.exposeInMainWorld("fileApi", {
   openDir: (callback: (event: IpcRendererEvent, tree: IDirTree[]) => void) =>
     ipcRenderer.on("open-dir", callback),
 
+  // 侦听文件夹或文件变化触发事件
+  changeInvoke: (
+    callback: (event: IpcRendererEvent, tree: IDirTree[]) => void
+  ) => ipcRenderer.on("change-invoke", callback),
+
   // 选择文件
   selectFile: (path: string) => ipcRenderer.invoke("select-file", path),
 
   // 新建文件
-  createFile:(path:string)=>ipcRenderer.invoke("create-file", path)
+  createFile: (path: string) => ipcRenderer.invoke("create-file", path),
 });
 
 contextBridge.exposeInMainWorld("viewApi", {

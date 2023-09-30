@@ -1,14 +1,14 @@
 <template>
   <div class="main">
-    <md-editor class="editor" :editor-id="textObj.id" v-model="textObj.text">
+    <md-editor class="editor" :editor-id="mdText.id" v-model="mdText.text">
     </md-editor>
   </div>
 </template>
 
 <script setup lang="ts">
-import { IMdText } from "@/types/text";
+import { IMdText } from "@/types/MdText";
 const props = defineProps<{
-  textObj: IMdText;
+  mdText: IMdText;
 }>();
 </script>
 

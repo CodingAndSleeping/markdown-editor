@@ -12,15 +12,15 @@
       @move-end="handleMoveEnd"
     >
       <template #first>
-        <SideBar :textObj="textObj"></SideBar>
+        <SideBar :mdText="mdText"></SideBar>
       </template>
 
       <template #resize-trigger>
         <div class="resize-triger"></div>
       </template>
       <template #second>
-        <Editor :textObj="textObj" v-if="type === 'edit'"></Editor>
-        <Preview :textObj="textObj" v-if="type === 'preview'"></Preview>
+        <Editor :mdText="mdText" v-if="mdText.mode === 'edit'"></Editor>
+        <Preview :mdText="mdText" v-if="mdText.mode === 'preview'"></Preview>
       </template>
     </a-split>
   </div>
@@ -30,23 +30,24 @@
 import SideBar from "@/views/components/SideBar.vue";
 import Editor from "@/views/components/Editor.vue";
 import Preview from "@/views/components/Preview.vue";
-import { IMdText } from "@/types/text";
+import { IMdText } from "@/types/MdText";
 import { ref } from "vue";
 import { IpcRendererEvent } from "electron";
 const { fileApi, viewApi } = window;
-const textObj = ref<IMdText>({
+const mdText = ref<IMdText>({
   id: "editor1",
-  text: "# aaa",
+  text: "",
+  title:"",
+  mode:'edit',
+  isChanged:false
 });
-const type = ref<"edit" | "preview">("edit");
 fileApi.openFile((event: IpcRendererEvent, value: string) => {
-  type.value = "edit";
-  textObj.value.text = value;
+  mdText.value.mode = "edit";
+  mdText.value.text = value;
 });
 fileApi.openSaveDialog(async (event: IpcRendererEvent) => {
   // 把文本传给主进程
-  event.sender.send("save-file", textObj.value.text)
-
+  event.sender.send("save-file", mdText.value.text);
 });
 
 // 是否显示侧边栏

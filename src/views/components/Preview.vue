@@ -1,13 +1,13 @@
 <template>
   <div class="preview">
-    <md-preview :editor-id="textObj.id" v-model="textObj.text"> </md-preview>
+    <md-preview :editor-id="mdText.id" v-model="mdText.text"> </md-preview>
   </div>
 </template>
 
 <script setup lang="ts">
-import { IMdText } from "@/types/text";
+import { IMdText } from "@/types/MdText";
 const props = defineProps<{
-  textObj: IMdText;
+  mdText: IMdText;
 }>();
 </script>
 

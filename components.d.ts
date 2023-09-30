@@ -7,6 +7,8 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AInput: typeof import('@arco-design/web-vue')['Input']
+    AScrollbar: typeof import('@arco-design/web-vue')['Scrollbar']
     ASplit: typeof import('@arco-design/web-vue')['Split']
     ATabPane: typeof import('@arco-design/web-vue')['TabPane']
     ATabs: typeof import('@arco-design/web-vue')['Tabs']

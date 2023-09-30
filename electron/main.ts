@@ -6,8 +6,8 @@ import {selectFile, createFile} from './file/index';
 process.env["ELECTRON_DISABLE_SECURITY_WARNINGS"] = "true"; // 去掉警告
 
 app.whenReady().then(() => {
-  const win =  createWindow()
-  setMenu()
+  createWindow()  // 创建窗口
+  setMenu()  // 设置菜单
   selectFile() // 注册选择文件监听事件
   createFile() // 注册创建文件监听事件
   app.on("activate", function () {

@@ -1,7 +1,6 @@
 import { BrowserWindow } from "electron";
 import path from 'path';
 
-
 export default async function(){
     // 创建浏览器窗口
   const mainWindow = new BrowserWindow({

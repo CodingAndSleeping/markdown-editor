@@ -1,11 +1,12 @@
 <template>
-  <div class="main" >
+  <div class="main">
     <a-tabs v-model:active-key="activeTab" :justify="true">
       <a-tab-pane key="1" title="文件">
         <a-tree
           ref="treeRef"
           :field-names="{
             title: 'name',
+            key: 'path',
           }"
           action-on-node-click="expand"
           :data="treeData"
@@ -16,7 +17,7 @@
             <svg-icon name="folder" v-if="node.type === 'dir'"></svg-icon>
           </template>
 
-          <template #title="node">
+          <template #title="node: IDirTree">
             <div
               v-if="!node.edit"
               @contextmenu.prevent="handleContextMenu($event, node)"
@@ -28,7 +29,7 @@
             <a-input
               type="text"
               v-if="node.edit"
-              :ref="(el:HTMLInputElement) => getInputRef(el as HTMLInputElement, node)"
+              :ref="(el) => getInputRef(el as InputInstance, node)"
               v-model="node.name"
               @focus="handleFocus"
               @blur="handleBlur(node)"
@@ -45,63 +46,68 @@
         </div>
       </a-tab-pane>
       <a-tab-pane key="2" title="大纲">
-        <md-catalog class="catalog" :editor-id="textObj.id"></md-catalog>
+        <md-catalog class="catalog" :editor-id="mdText.id"></md-catalog>
       </a-tab-pane>
     </a-tabs>
   </div>
 </template>
 
 <script setup lang="ts">
-import { IMdText } from "@/types/text";
+import { IMdText } from "@/types/MdText";
 import { ref, nextTick } from "vue";
 import IDirTree from "@/types/DirTree";
 import { IpcRendererEvent } from "electron";
 import SvgIcon from "@/components/SvgIcon.vue";
+import { InputInstance, TreeInstance } from "@arco-design/web-vue";
 const { fileApi } = window;
 const props = defineProps<{
-  textObj: IMdText;
+  mdText: IMdText;
 }>();
-const activeTab = ref<string>('2')
-const treeRef = ref<any | null>(null);
+const activeTab = ref<string>("2");
+const treeRef = ref<TreeInstance | null>(null);
 const treeData = ref<IDirTree[]>([]);
 // 打开文件执行的回调函数
 fileApi.openDir((e: IpcRendererEvent, tree: IDirTree[]) => {
-  activeTab.value = '1'
-  props.textObj.text = ''
+  activeTab.value = "1";
+  treeData.value = tree;
+});
+// 文件夹或文件内容改变执行回调函数
+fileApi.changeInvoke((e: IpcRendererEvent, tree: IDirTree[]) => {
+  activeTab.value = "1";
   treeData.value = tree;
 });
 
-function selectFn(node: any) {
+function selectFn(node: IDirTree) {
   // 只有文件才能被选择
   return node.type === "file" ? true : false;
 }
 
 // 选择文件
-async function handleSelect(node: any) {
+async function handleSelect(node: IDirTree) {
   if (node.type === "file") {
-    treeRef.value.selectNode(node.key, true);
-    const res = await fileApi.selectFile(node.path + "/" + node.name);
-    props.textObj.text = res;
+    treeRef.value!.selectNode(node.path, true);
+    const res = await fileApi.selectFile(node.basedir + "/" + node.name);
+    props.mdText.text = res;
   }
 }
 
 // 右键菜单
-function handleContextMenu(e: MouseEvent, node: any) {
+function handleContextMenu(e: MouseEvent, node: IDirTree) {
   console.log(e, node);
 }
 
 function handleFocus(e: any) {
   e.currentTarget!.select();
 }
-function handleBlur(node: any) {
+function handleBlur(node: IDirTree) {
   node.edit = false;
   // 主进程创建文件
-  fileApi.createFile(node.path + "/" + node.name);
+  fileApi.createFile(node.basedir + "/" + node.name);
 }
 
 // 收集输入框元素
-const inputRefDict = ref<Record<string, any>>({});
-function getInputRef(el: HTMLInputElement, node: any) {
+const inputRefDict = ref<Record<string, Record<string, InputInstance>>>({});
+function getInputRef(el: InputInstance, node: any) {
   if (el) {
     inputRefDict.value[node.name] = {
       el,
@@ -130,13 +136,13 @@ async function createFile(node: IDirTree) {
     type: "file",
     deep: node.deep + 1,
     edit: true,
-    key: node.path + "/" + node.name + "/" + "Untitled" + max + ".md",
-    path: node.path + "/" + node.name,
+    path: node.basedir + "/" + node.name + "/" + "Untitled" + max + ".md",
+    basedir: node.basedir + "/" + node.name,
   };
 
   node.children!.push(newFIle);
+
   nextTick(() => {
-    // inputRefDict.value[newFIle.name].node.edit = true;
     inputRefDict.value[newFIle.name].el.focus();
   });
 }

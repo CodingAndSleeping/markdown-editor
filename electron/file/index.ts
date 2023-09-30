@@ -30,30 +30,39 @@ const filters: Electron.FileFilter[] = [
 ];
 
 // 打开文件
-export function openFile(win: BrowserWindow) {
+export async function openFile(win: BrowserWindow) {
   const file = dialog.showOpenDialogSync({
     filters,
     properties: ["openFile"],
   });
 
   if (file) {
-    let res: string = "";
-    const rs = fs.createReadStream(file[0], {
-      encoding: "utf8",
-    });
+    // let res: string = "";
+    // const rs = fs.createReadStream(file[0], {
+    //   encoding: "utf8",
+    // });
 
-    rs.on("data", (chunk) => {
-      res += chunk;
-    });
+    // rs.on("data", (chunk) => {
+    //   res += chunk;
+    // });
 
-    rs.on("error", (err) => {
-      console.log(err);
-    });
+    // rs.on("error", (err) => {
+    //   console.log(err);
+    // });
 
-    rs.on("end", () => {
-      win.webContents.send("open-file", res);
-      rs.close();
-    });
+    // rs.on("end", () => {
+    //   win.webContents.send("open-file", res);
+    //   rs.close();
+    // });
+    try {
+      const newWin = await createWindow();
+      const res = fs.readFileSync(file[0], {
+        encoding: "utf8",
+      });
+      newWin.webContents.send("open-file", res);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
@@ -62,37 +71,45 @@ export function saveFile(win: BrowserWindow) {
   const file = dialog.showSaveDialogSync({});
 
   if (file) {
-    const ws = fs.createWriteStream(file, {
-      encoding: "utf8",
-      flags: "w",
-    });
+
+    // const ws = fs.createWriteStream(file, {
+    //   encoding: "utf8",
+    //   flags: "w",
+    // });
     ipcMain.on(
       "save-file",
       (event: Electron.IpcMainInvokeEvent, text: string) => {
-        ws.write(text);
+        // ws.write(text);
+        try {
+          fs.writeFileSync(file, text);
+        } catch (error) {
+          console.log(error)
+        }
+ 
       }
     );
-    ws.on("finish", () => {
-      console.log("保存成功！");
-      ws.close();
-    });
 
-    ws.on("error", (err: Error) => {
-      console.log(err);
-    });
     win.webContents.send("open-save-dialog");
+    // ws.on("finish", () => {
+    //   console.log("保存成功！");
+    //   ws.close();
+    // });
+
+    // ws.on("error", (err: Error) => {
+    //   console.log(err);
+    // });
+
   }
 }
 
 // 打开文件夹
 export async function openDir(win: BrowserWindow) {
-
   const files = dialog.showOpenDialogSync({
     properties: ["openDirectory"],
   });
   if (files) {
     // 打开一个新窗口
-    const newWin =await createWindow()
+    const newWin = await createWindow();
     const tree: IDirTree[] = createDirTree(
       files,
       0,
@@ -103,15 +120,19 @@ export async function openDir(win: BrowserWindow) {
     newWin.webContents.send("open-dir", tree);
 
     // 侦听目录变化
-    fs.watch(files[0], null, (eventType:fs.WatchEventType, filename:string | null)=>{
-      const tree: IDirTree[] = createDirTree(
-        files,
-        0,
-        ["node_modules"],
-        filters[0].extensions
-      );
-      newWin.webContents.send("open-dir", tree);
-    })
+    fs.watch(
+      files[0],
+      null,
+      (eventType: fs.WatchEventType, filename: string | null) => {
+        const tree: IDirTree[] = createDirTree(
+          files,
+          0,
+          ["node_modules"],
+          filters[0].extensions
+        );
+        newWin.webContents.send("change-invoke", tree);
+      }
+    );
   }
 }
 
@@ -122,24 +143,31 @@ export function selectFile() {
     (event: Electron.IpcMainInvokeEvent, path: string) => {
       let res: string = "";
       if (path) {
-        res = fs.readFileSync(path, {
-          encoding: "utf8",
-        });
+        try {
+          res = fs.readFileSync(path, {
+            encoding: "utf8",
+          });
+        } catch (error) {
+          console.log(error);
+        }
       }
       return res;
     }
   );
 }
 
-
 // 新建文件
-export function createFile(){
-  ipcMain.handle('create-file', (e:Electron.IpcMainInvokeEvent, path:string)=>{
-    if(!fs.existsSync(path)){
-      console.log(path)
-     fs.writeFileSync(path, '')
-    }  
-  })
+export function createFile() {
+  ipcMain.handle(
+    "create-file",
+    (e: Electron.IpcMainInvokeEvent, path: string) => {
+      try {
+        if (!fs.existsSync(path)) {
+          fs.writeFileSync(path, "");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  );
 }
-
-

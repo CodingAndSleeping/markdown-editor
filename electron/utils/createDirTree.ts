@@ -32,33 +32,41 @@ export default function createDirTree(
   }
 
   let res: IDirTree[] = [];
+  try {
+    res = dirs.map((dir, index) => {
+      const basedir = path.dirname(dir);
+      const name = path.basename(dir);
+      const stat = fs.statSync(dir);
+      if (stat.isDirectory()) {
+        const subDirs = fs.readdirSync(dir).map((item) => path.join(dir, item)); // 拼接子文件路径
+        return {
+          basedir: basedir,
+          name: name,
+          type: "dir",
+          deep: deep,
+          path: basedir + "/" + name,
+          edit: false,
+          children: createDirTree( // 递归调用
+            subDirs,
+            deep + 1,
+            filter,
+            destinationExtName
+          ),
+        };
+      }
 
-  res = dirs.map((dir, index) => {
-    const filePath = path.dirname(dir)
-    const name = path.basename(dir);
-    const stat = fs.statSync(dir);
-    if (stat.isDirectory()) {
-      const subDirs = fs.readdirSync(dir).map((item) => path.join(dir, item)); // 拼接子文件路径
       return {
-        path: filePath,
+        basedir: basedir,
         name: name,
-        type: "dir",
+        type: "file",
         deep: deep,
-        key: filePath+ '/' + name,
         edit: false,
-        children: createDirTree(subDirs, deep + 1, filter, destinationExtName), // 递归调用
+        path: basedir + "/" + name,
       };
-    }
-
-    return {
-      path: filePath,
-      name: name,
-      type: "file",
-      deep: deep,
-      edit: false,
-      key: filePath+ '/' + name,
-    };
-  });
+    });
+  } catch (error) {
+    console.log(error);
+  }
 
   return res;
 }

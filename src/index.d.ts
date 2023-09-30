@@ -1,11 +1,11 @@
 import { IpcRendererEvent } from "electron";
 
 export interface IDirTree {
-  path: string;
+  basedir: string;
   name: string;
   type: "dir" | "file";
   deep: number;
-  key: string;
+  path: string;
   edit:boolean,
   children?: IDirTree[];
 }
@@ -22,6 +22,10 @@ export interface IFileApi {
   // saveFile: (text: string) => void;
 
   openDir: (
+    callback: (event: IpcRendererEvent, tree:IDirTree[]) => void
+  ) => Electron.IpcRenderer;
+
+  changeInvoke: (
     callback: (event: IpcRendererEvent, tree:IDirTree[]) => void
   ) => Electron.IpcRenderer;
 
