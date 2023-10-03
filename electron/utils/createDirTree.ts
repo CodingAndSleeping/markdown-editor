@@ -38,7 +38,7 @@ export default function createDirTree(
       const name = path.basename(dir);
       const stat = fs.statSync(dir);
       if (stat.isDirectory()) {
-        const subDirs = fs.readdirSync(dir).map((item) => path.join(dir, item)); // 拼接子文件路径
+        const subDirs = fs.readdirSync(dir).map((item) => path.join(dir, item).replaceAll('\\', '/')); // 拼接子文件路径
         return {
           basedir: basedir,
           name: name,

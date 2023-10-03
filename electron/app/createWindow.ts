@@ -6,6 +6,7 @@ export default async function(){
   const mainWindow = new BrowserWindow({
     width: 1000,
     height: 900,
+    
     webPreferences: {
       // 引入预加载文件
       preload: path.join(__dirname, "../preload.js"),

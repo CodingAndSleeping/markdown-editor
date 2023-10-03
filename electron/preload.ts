@@ -1,9 +1,15 @@
 import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
 import IDirTree from "./types/dirTree";
+import { IMdText } from "./types/MdText";
 contextBridge.exposeInMainWorld("fileApi", {
   // 打开文件
-  openFile: (callback: (event: IpcRendererEvent, value: string) => void) =>
-    ipcRenderer.on("open-file", callback),
+  openFile: (
+    callback: (
+      event: IpcRendererEvent,
+      mdText: IMdText,
+      tree: IDirTree[]
+    ) => void
+  ) => ipcRenderer.on("open-file", callback),
 
   // 当保存文件
   openSaveDialog: (callback: (event: IpcRendererEvent) => void) =>
@@ -11,6 +17,10 @@ contextBridge.exposeInMainWorld("fileApi", {
 
   // // 保存文件
   // saveFile: (text: string) => ipcRenderer.send("save-file", text),
+
+  // 判断当前是否是已打开的文件
+  isHasPath: (callback: (event: IpcRendererEvent) => void) =>
+    ipcRenderer.on("is-has-path", callback),
 
   // 打开文件夹
   openDir: (callback: (event: IpcRendererEvent, tree: IDirTree[]) => void) =>
@@ -26,10 +36,17 @@ contextBridge.exposeInMainWorld("fileApi", {
 
   // 新建文件
   createFile: (path: string) => ipcRenderer.invoke("create-file", path),
+
+  // 保存文件提示弹窗
+  // saveFileTip: (mdText: IMdText) => ipcRenderer.invoke("save-file-tip", mdText),
 });
 
 contextBridge.exposeInMainWorld("viewApi", {
   // 显示/隐藏侧边栏
   isShowSidebar: (callback: () => void) =>
     ipcRenderer.on("is-show-sidebar", callback),
+});
+
+contextBridge.exposeInMainWorld("windowApi", {
+  setTitle: (title: string) => ipcRenderer.send("set-title", title),
 });

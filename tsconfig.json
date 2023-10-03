@@ -3,7 +3,7 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "CommonJS",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
     "esModuleInterop": true,
 
@@ -30,6 +30,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["electron/*.ts", "src/**/*.d.ts", "src/**/*.vue"],
+  "include": ["electron/*.ts", "src/**/*.d.ts", "src/**/*.vue", "src/**/*.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

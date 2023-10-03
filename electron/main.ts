@@ -1,19 +1,23 @@
 // 控制应用生命周期和创建原生浏览器窗口的模组
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import createWindow from "./app/createWindow";
-import setMenu from './app/setMenu';
-import {selectFile, createFile} from './file/index';
+import setMenu from "./app/setMenu";
+import { selectFile, createFile } from "./file/index";
 process.env["ELECTRON_DISABLE_SECURITY_WARNINGS"] = "true"; // 去掉警告
 
 app.whenReady().then(() => {
-  createWindow()  // 创建窗口
-  setMenu()  // 设置菜单
-  selectFile() // 注册选择文件监听事件
-  createFile() // 注册创建文件监听事件
+  createWindow(); // 创建窗口
+  setMenu(); // 设置菜单
+  selectFile(); // 注册选择文件监听事件
+  createFile(); // 注册创建文件监听事件
+  // saveFileTip() // 注册保存文件提示弹窗监听事件
   app.on("activate", function () {
     // 通常在 macOS 上，当点击 dock 中的应用程序图标时，如果没有其他
     // 打开的窗口，那么程序会重新创建一个窗口。
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+  ipcMain.on("set-title", (e: Electron.IpcMainInvokeEvent, title: string) => {
+    BrowserWindow.getFocusedWindow()?.setTitle(title);
   });
 });
 

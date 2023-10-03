@@ -46,7 +46,10 @@
         </div>
       </a-tab-pane>
       <a-tab-pane key="2" title="大纲">
-        <md-catalog class="catalog" :editor-id="mdText.id"></md-catalog>
+        <md-catalog
+          class="catalog"
+          :editor-id="store.id || 'editor1'"
+        ></md-catalog>
       </a-tab-pane>
     </a-tabs>
   </div>
@@ -54,22 +57,60 @@
 
 <script setup lang="ts">
 import { IMdText } from "@/types/MdText";
-import { ref, nextTick } from "vue";
+import { ref, nextTick, watchEffect, watch, toRaw, WatchStopHandle, toRef } from "vue";
 import IDirTree from "@/types/DirTree";
 import { IpcRendererEvent } from "electron";
 import SvgIcon from "@/components/SvgIcon.vue";
 import { InputInstance, TreeInstance } from "@arco-design/web-vue";
-const { fileApi } = window;
-const props = defineProps<{
-  mdText: IMdText;
-}>();
+import { useMdTextStore } from "@/store/mdText";
+// import saveFileTip from "@/utils/saveFileTip";
+
+const { fileApi, windowApi } = window;
+// const props = defineProps<{
+//   mdText: IMdText;
+// }>();
+const store = useMdTextStore();
+
 const activeTab = ref<string>("2");
 const treeRef = ref<TreeInstance | null>(null);
 const treeData = ref<IDirTree[]>([]);
-// 打开文件执行的回调函数
+
+// 打开文件回调函数
+fileApi.openFile(
+  (event: IpcRendererEvent, mdText: IMdText, tree: IDirTree[]) => {
+    store.$patch(mdText);
+    activeTab.value = "1";
+    treeData.value = tree;
+    nextTick(() => {
+      treeRef.value!.expandNode(store.baseDir, true);
+      treeRef.value!.selectNode(store.id, true);
+    });
+  }
+);
+
+fileApi.isHasPath(async (event: IpcRendererEvent) => {
+  // 保存
+  const newMdText = await event.sender.invoke("save-file", toRaw(store.$state));
+  windowApi.setTitle(newMdText.name || "new file");
+  store.$patch(newMdText);
+});
+
+// 打开文件夹执行的回调函数
 fileApi.openDir((e: IpcRendererEvent, tree: IDirTree[]) => {
   activeTab.value = "1";
   treeData.value = tree;
+
+  store.$patch({
+    id: "",
+    name: "",
+    mode: "edit",
+    text: "",
+    isChanged: false,
+  });
+
+  nextTick(() => {
+    treeRef.value!.expandNode(treeData.value[0].path, true);
+  });
 });
 // 文件夹或文件内容改变执行回调函数
 fileApi.changeInvoke((e: IpcRendererEvent, tree: IDirTree[]) => {
@@ -85,15 +126,27 @@ function selectFn(node: IDirTree) {
 // 选择文件
 async function handleSelect(node: IDirTree) {
   if (node.type === "file") {
-    treeRef.value!.selectNode(node.path, true);
-    const res = await fileApi.selectFile(node.basedir + "/" + node.name);
-    props.mdText.text = res;
+    // saveFileTip(store.$state) // 提示保存！
+
+
+    const res = await fileApi.selectFile(node.path);
+
+    store.$patch({
+      text: res,
+      id: node.path,
+      isChanged: false,
+      name: node.name,
+      baseDir: node.basedir,
+    });
+
+
   }
 }
 
 // 右键菜单
 function handleContextMenu(e: MouseEvent, node: IDirTree) {
   console.log(e, node);
+  //
 }
 
 function handleFocus(e: any) {
@@ -146,6 +199,31 @@ async function createFile(node: IDirTree) {
     inputRefDict.value[newFIle.name].el.focus();
   });
 }
+
+// 侦听文件变化
+let unWatch: WatchStopHandle;
+watch(
+  () => store.isChanged,
+  (newVal) => {
+    if (newVal) {
+      unWatch && unWatch();
+    } else {
+      unWatch = watch(
+        () => store.text,
+        (newVal) => {
+          const title = store.name ? store.name + "*" : "new file";
+          console.log(title);
+          windowApi.setTitle(title);
+
+          store.isChanged = true;
+        }
+      );
+    }
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
 
 <style lang="scss" scoped>

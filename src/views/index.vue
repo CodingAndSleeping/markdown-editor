@@ -32,22 +32,14 @@ import Editor from "@/views/components/Editor.vue";
 import Preview from "@/views/components/Preview.vue";
 import { IMdText } from "@/types/MdText";
 import { ref } from "vue";
-import { IpcRendererEvent } from "electron";
-const { fileApi, viewApi } = window;
+const { viewApi } = window;
 const mdText = ref<IMdText>({
-  id: "editor1",
+  id: "",
   text: "",
-  title:"",
-  mode:'edit',
-  isChanged:false
-});
-fileApi.openFile((event: IpcRendererEvent, value: string) => {
-  mdText.value.mode = "edit";
-  mdText.value.text = value;
-});
-fileApi.openSaveDialog(async (event: IpcRendererEvent) => {
-  // 把文本传给主进程
-  event.sender.send("save-file", mdText.value.text);
+  name: "",
+  baseDir: "",
+  mode: "edit",
+  isChanged: false,
 });
 
 // 是否显示侧边栏
