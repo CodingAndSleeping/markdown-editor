@@ -70,7 +70,11 @@ export async function openFile(win: BrowserWindow) {
 
 // 保存文件
 export function saveFile(win: BrowserWindow) {
-  ipcMain.handleOnce(
+  win.webContents.send("is-has-path");
+}
+
+export function onSaveFile(){
+  ipcMain.handle(
     "save-file",
     (e: Electron.IpcMainInvokeEvent, mdText: IMdText) => {
       if (mdText.id) {
@@ -97,7 +101,6 @@ export function saveFile(win: BrowserWindow) {
     }
   );
 
-  win.webContents.send("is-has-path");
 }
 
 // 打开文件夹
@@ -140,7 +143,7 @@ export async function openDir(win: BrowserWindow) {
 }
 
 // 选择文件
-export function selectFile() {
+export function onSelectFile() {
   ipcMain.handle(
     "select-file",
     (event: Electron.IpcMainInvokeEvent, path: string) => {
@@ -160,7 +163,7 @@ export function selectFile() {
 }
 
 // 新建文件
-export function createFile() {
+export function onCreateFile() {
   ipcMain.handle(
     "create-file",
     (e: Electron.IpcMainInvokeEvent, path: string) => {

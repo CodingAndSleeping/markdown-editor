@@ -15,8 +15,8 @@ contextBridge.exposeInMainWorld("fileApi", {
   openSaveDialog: (callback: (event: IpcRendererEvent) => void) =>
     ipcRenderer.on("open-save-dialog", callback),
 
-  // // 保存文件
-  // saveFile: (text: string) => ipcRenderer.send("save-file", text),
+  // 保存文件
+  saveFile: (mdText: IMdText) => ipcRenderer.invoke("save-file", mdText),
 
   // 判断当前是否是已打开的文件
   isHasPath: (callback: (event: IpcRendererEvent) => void) =>
@@ -36,15 +36,20 @@ contextBridge.exposeInMainWorld("fileApi", {
 
   // 新建文件
   createFile: (path: string) => ipcRenderer.invoke("create-file", path),
-
-  // 保存文件提示弹窗
-  // saveFileTip: (mdText: IMdText) => ipcRenderer.invoke("save-file-tip", mdText),
+  
 });
 
 contextBridge.exposeInMainWorld("viewApi", {
   // 显示/隐藏侧边栏
   isShowSidebar: (callback: () => void) =>
     ipcRenderer.on("is-show-sidebar", callback),
+
+
+  enableEdit:(callback: () => void) =>
+  ipcRenderer.on("enable-edit", callback),
+
+  enablePreview:(callback: () => void) =>
+  ipcRenderer.on("enable-preview", callback),
 });
 
 contextBridge.exposeInMainWorld("windowApi", {

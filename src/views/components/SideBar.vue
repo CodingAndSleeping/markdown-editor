@@ -29,7 +29,7 @@
             <a-input
               type="text"
               v-if="node.edit"
-              :ref="(el) => getInputRef(el as InputInstance, node)"
+              :ref="(el) => getInputRef(el as InputInstance, node as IDirTree)"
               v-model="node.name"
               @focus="handleFocus"
               @blur="handleBlur(node)"
@@ -52,23 +52,33 @@
         ></md-catalog>
       </a-tab-pane>
     </a-tabs>
+
+    <a-modal :visible="modelVisible" :closable="false">
+      <div>内容尚未保存，是否保存？</div>
+      <template #footer>
+        <a-button class="confim" status="danger" @click="handleConfim"
+          >保存</a-button
+        >
+        <a-button class="abandon" status="warning" @click="handleAbandon"
+          >放弃更改</a-button
+        >
+        <a-button class="cancel" @click="handleCancel">取消</a-button>
+      </template>
+    </a-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { IMdText } from "@/types/MdText";
-import { ref, nextTick, watchEffect, watch, toRaw, WatchStopHandle, toRef } from "vue";
+import { ref, nextTick, watch, toRaw, WatchStopHandle } from "vue";
 import IDirTree from "@/types/DirTree";
 import { IpcRendererEvent } from "electron";
 import SvgIcon from "@/components/SvgIcon.vue";
 import { InputInstance, TreeInstance } from "@arco-design/web-vue";
 import { useMdTextStore } from "@/store/mdText";
-// import saveFileTip from "@/utils/saveFileTip";
 
 const { fileApi, windowApi } = window;
-// const props = defineProps<{
-//   mdText: IMdText;
-// }>();
+
 const store = useMdTextStore();
 
 const activeTab = ref<string>("2");
@@ -123,23 +133,57 @@ function selectFn(node: IDirTree) {
   return node.type === "file" ? true : false;
 }
 
+const modelVisible = ref<boolean>(false);
+const selectNode = ref<IDirTree>();
+async function handleConfim() {
+  fileApi.saveFile(toRaw(store.$state));
+  modelVisible.value = false;
+  const res = await fileApi.selectFile(selectNode.value!.path);
+  store.$patch({
+    text: res,
+    id: selectNode.value!.path,
+    isChanged: false,
+    name: selectNode.value!.name,
+    baseDir: selectNode.value!.basedir,
+  });
+  windowApi.setTitle(selectNode.value!.name)
+}
+
+async function handleAbandon() {
+  modelVisible.value = false;
+  const res = await fileApi.selectFile(selectNode.value!.path);
+  store.$patch({
+    text: res,
+    id: selectNode.value!.path,
+    isChanged: false,
+    name: selectNode.value!.name,
+    baseDir: selectNode.value!.basedir,
+  });
+  windowApi.setTitle(selectNode.value!.name)
+}
+
+function handleCancel() {
+  modelVisible.value = false;
+}
 // 选择文件
 async function handleSelect(node: IDirTree) {
   if (node.type === "file") {
-    // saveFileTip(store.$state) // 提示保存！
+    selectNode.value = node;
+    // 提示保存！
+    if (store.isChanged) {
+      modelVisible.value = true;
+    } else {
+      const res = await fileApi.selectFile(node.path);
+      store.$patch({
+        text: res,
+        id: node.path,
+        isChanged: false,
+        name: node.name,
+        baseDir: node.basedir,
+      });
 
-
-    const res = await fileApi.selectFile(node.path);
-
-    store.$patch({
-      text: res,
-      id: node.path,
-      isChanged: false,
-      name: node.name,
-      baseDir: node.basedir,
-    });
-
-
+      windowApi.setTitle(node.name)
+    }
   }
 }
 
@@ -159,8 +203,10 @@ function handleBlur(node: IDirTree) {
 }
 
 // 收集输入框元素
-const inputRefDict = ref<Record<string, Record<string, InputInstance>>>({});
-function getInputRef(el: InputInstance, node: any) {
+const inputRefDict = ref<Record<string, { el: InputInstance; node: IDirTree }>>(
+  {}
+);
+function getInputRef(el: InputInstance, node: IDirTree) {
   if (el) {
     inputRefDict.value[node.name] = {
       el,

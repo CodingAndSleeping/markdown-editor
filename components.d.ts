@@ -7,16 +7,13 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AButton: typeof import('@arco-design/web-vue')['Button']
     AInput: typeof import('@arco-design/web-vue')['Input']
-    AScrollbar: typeof import('@arco-design/web-vue')['Scrollbar']
+    AModal: typeof import('@arco-design/web-vue')['Modal']
     ASplit: typeof import('@arco-design/web-vue')['Split']
     ATabPane: typeof import('@arco-design/web-vue')['TabPane']
     ATabs: typeof import('@arco-design/web-vue')['Tabs']
     ATree: typeof import('@arco-design/web-vue')['Tree']
-    ATypographyParagraph: typeof import('@arco-design/web-vue')['TypographyParagraph']
-    Editor: typeof import('./src/components/Editor.vue')['default']
-    Preview: typeof import('./src/components/Preview.vue')['default']
-    SideBar: typeof import('./src/components/SideBar.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon.vue')['default']
   }
 }

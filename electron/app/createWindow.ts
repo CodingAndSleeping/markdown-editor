@@ -20,7 +20,7 @@ export default async function(){
     mainWindow.webContents.openDevTools();
   } else {
     // 否则页面加载打包后的index.html文件
-    await mainWindow.loadFile(path.join(__dirname, "./index.html"));
+    await mainWindow.loadFile(path.join(__dirname, "../../index.html"));
   }
 
   return mainWindow;

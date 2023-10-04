@@ -12,15 +12,15 @@
       @move-end="handleMoveEnd"
     >
       <template #first>
-        <SideBar :mdText="mdText"></SideBar>
+        <SideBar></SideBar>
       </template>
 
       <template #resize-trigger>
         <div class="resize-triger"></div>
       </template>
       <template #second>
-        <Editor :mdText="mdText" v-if="mdText.mode === 'edit'"></Editor>
-        <Preview :mdText="mdText" v-if="mdText.mode === 'preview'"></Preview>
+        <Editor v-if="store.mode === 'edit'"></Editor>
+        <Preview v-if="store.mode === 'preview'"></Preview>
       </template>
     </a-split>
   </div>
@@ -32,16 +32,16 @@ import Editor from "@/views/components/Editor.vue";
 import Preview from "@/views/components/Preview.vue";
 import { IMdText } from "@/types/MdText";
 import { ref } from "vue";
+import { useMdTextStore } from "@/store/mdText";
 const { viewApi } = window;
-const mdText = ref<IMdText>({
-  id: "",
-  text: "",
-  name: "",
-  baseDir: "",
-  mode: "edit",
-  isChanged: false,
-});
 
+const store = useMdTextStore();
+viewApi.enableEdit(() => {
+  store.mode = "edit";
+});
+viewApi.enablePreview(() => {
+  store.mode = "preview";
+});
 // 是否显示侧边栏
 const showSideBar = ref<boolean>(true);
 // 侧边栏尺寸

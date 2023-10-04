@@ -31,7 +31,7 @@ export interface IFileApi {
     callback: (event: IpcRendererEvent) => void
   ) => Electron.IpcRenderer;
 
-  // saveFile: (text: string) => void;
+  saveFile: (mdText: IMdText) => Promise<IMdText>;
 
   isHasPath: (
     callback: (event: IpcRendererEvent) => void
@@ -48,12 +48,14 @@ export interface IFileApi {
   selectFile: (path: string) => Promise<string>;
 
   createFile: (path: string) => Promise<any>;
-
-  // saveFileTip: (mdText: IMdText) => Promise<IMdText>;
 }
 
 export interface IViewApi {
   isShowSidebar: (callback: () => void) => Electron.IpcRenderer;
+
+  enableEdit: (callback: () => void) => Electron.IpcRenderer;
+
+  enablePreview: (callback: () => void) => Electron.IpcRenderer;
 }
 
 export interface IWindowApi {

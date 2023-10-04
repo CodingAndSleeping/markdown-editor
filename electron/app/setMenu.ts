@@ -1,6 +1,7 @@
 import { Menu, MenuItemConstructorOptions } from "electron";
 import { openFile, saveFile, openDir } from "../file/index";
 import createWindow from "./createWindow";
+import path from "path";
 export default function () {
   const template: MenuItemConstructorOptions[] = [
     {
@@ -55,13 +56,20 @@ export default function () {
       submenu: [
         //子菜单
         {
-          label: "复制",
-          accelerator: "CmdOrCtrl+C",
-          role: "copy",
+          label: "编辑",
+          type: "radio",
+          accelerator: "CmdOrCtrl+E",
+          click(menuItem, win, e) {
+            if (win) win.webContents.send("enable-edit");
+          },
         },
         {
-          label: "粘贴",
-          role: "paste",
+          label: "预览",
+          type: "radio",
+          accelerator: "CmdOrCtrl+P",
+          click(menuItem, win, e) {
+            if (win) win.webContents.send("enable-preview");
+          },
         },
       ],
     },
@@ -73,6 +81,16 @@ export default function () {
           accelerator: "CmdOrCtrl+Shift+L",
           click(menuItem, win, e) {
             if (win) win.webContents.send("is-show-sidebar");
+          },
+        },
+        {
+          label: "开发者工具",
+          accelerator: "CmdOrCtrl+Shift+D",
+          click(menuItem, win, e) {
+            if (win)
+              win.webContents.isDevToolsOpened()
+                ? win.webContents.closeDevTools()
+                : win.webContents.openDevTools();
           },
         },
       ],

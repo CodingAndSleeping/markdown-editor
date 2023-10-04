@@ -30,6 +30,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["electron/*.ts", "src/**/*.d.ts", "src/**/*.vue", "src/**/*.ts"],
+  "include": ["electron/**/*", "src/**/*.d.ts", "src/**/*.vue", "src/**/*.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
